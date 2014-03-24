@@ -4,6 +4,12 @@
  */
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.Queue;
+import java.util.HashSet;
+
 
 /* Your solution goes in this file.
  *
@@ -39,23 +45,82 @@ public class ProgramLab2 extends CourseList {
     	 * In case, finding such a partion is not possible, the length of 
     	 * the returned ArrayList should be zero, ie, it is empty.
     	 */
-	Long[] conflictingCourses;
+	Long[] indexesConflictingCourses;
+	Course course, conflictingCourse;
+	Set<Course> spring = new HashSet<Course>();
+	Set<Course> fall = new HashSet<Course>();
+	Set<Course> queued = new HashSet<Course>();	
+	Queue<Course> q = new LinkedList<Course>();
+
+	// Graph Representation
+	// Adjacency List
+	HashMap<String,LinkedList<Course>> graph = new HashMap<String,LinkedList<Course>>();
+	ArrayList<Course> nodes = new ArrayList<Course>();
+
+	// Build Graph Representation
 	for(int i = 0; i < courses.size(); i++){
-		System.out.println(courses.get(i).getName());
-		System.out.println(courses.get(i).getStartTime());
-		System.out.println(courses.get(i).getEndTime());
-		conflictingCourses = courses.get(i).getConflictCourses();
-		System.out.println("Conflicts with");
-		for(int j = 0; j < conflictingCourses.length; j++){
-			System.out.println(courses.get(conflictingCourses[j].intValue()).getName());
-			System.out.println(conflictingCourses[j]);
-			System.out.println(courses.get(conflictingCourses[j].intValue()).getStartTime());
-			System.out.println(courses.get(conflictingCourses[j].intValue()).getEndTime());
-		
+		course = courses.get(i);
+		if(course.selected){
+			LinkedList<Course> conflictingCourses = new LinkedList<Course>();
+			indexesConflictingCourses = courses.get(i).getConflictCourses();
+			for(int j = 0; j < indexesConflictingCourses.length; j++){
+				conflictingCourse = courses.get(indexesConflictingCourses[j].intValue());
+				if(conflictingCourse.selected){
+					conflictingCourses.add(conflictingCourse);
+				}
+			}
+			graph.put(course.getName(),conflictingCourses);
+			nodes.add(course);
 		}
-		System.out.println("##########################################");
 	}
-        return new ArrayList<ArrayList<Course>>(0);
+
+	// See if graph bipartite
+	Course unexploredCourse, adjacentCourse;
+	LinkedList<Course> adjacencyList;
+	for(int i = 0; i < nodes.size(); i++){
+		if(!spring.contains(nodes.get(i)) && !fall.contains(nodes.get(i))){
+			unexploredCourse = nodes.get(i);
+			spring.add(unexploredCourse);
+			q.add(unexploredCourse);
+			queued.add(unexploredCourse);
+			while(!q.isEmpty()){
+				unexploredCourse = q.poll();
+				adjacencyList = graph.get(unexploredCourse.getName());
+				for(int j = 0; j < adjacencyList.size(); j++){
+					adjacentCourse = adjacencyList.get(j);
+					if(spring.contains(unexploredCourse) && !spring.contains(adjacentCourse) && !queued.contains(adjacentCourse)){
+						fall.add(adjacentCourse);
+						q.add(adjacentCourse);
+						queued.add(adjacentCourse);
+					}
+					else if(fall.contains(unexploredCourse) && !fall.contains(adjacentCourse) && !queued.contains(adjacentCourse)){
+						spring.add(adjacentCourse);
+						q.add(adjacentCourse);
+						queued.add(adjacentCourse);
+					}
+					else if(!queued.contains(adjacentCourse)){ // not bipartite
+        					return new ArrayList<ArrayList<Course>>(0);
+					}
+				}
+			}
+		}
+	}
+	ArrayList<Course> springSemester, fallSemester;
+	springSemester = new ArrayList<Course>(spring);
+	fallSemester = new ArrayList<Course>(fall);
+	ArrayList<ArrayList<Course>> semesters = new ArrayList<ArrayList<Course>>();
+	semesters.add(fallSemester);
+	semesters.add(springSemester);
+
+	System.out.println("Spring");
+	for(int i = 0; i < springSemester.size(); i++){
+		System.out.println(springSemester.get(i).getName());
+	}
+	System.out.println("Fall");
+	for(int i = 0; i < fallSemester.size(); i++){
+		System.out.println(fallSemester.get(i).getName());
+	}
+        return semesters;
     }
     
     public ArrayList<Course> dependencyList() {
