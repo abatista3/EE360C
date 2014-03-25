@@ -153,26 +153,25 @@ public class ProgramLab2 extends CourseList {
 	Course course, prereqCourse;
 	ArrayList<Course> sequence = new ArrayList<Course>();
 	Set<Course> queued = new HashSet<Course>();	
-	Queue<Course> nodesNoIncomingEdges = new LinkedList<Course>();
-	HashMap<Course,Integer> nodeIncomingEdges = new HashMap<Course,Integer>();
-	LinkedList<Course> prereqCourses = new LinkedList<Course>();
-	Integer numIncomingEdges;
+	Queue<Course> q = new LinkedList<Course>();
+	Queue<String> nodesNoIncomingEdges = new LinkedList<String>();
 
 	// Graph Representation
 	// Adjacency List
 	HashMap<String,LinkedList<Course>> graph = new HashMap<String,LinkedList<Course>>();
 	ArrayList<Course> nodes = new ArrayList<Course>();
+	HashMap<String,Integer> nodeIncomingEdges = new HashMap<String,Integer>();
 
 	// Build Graph Representation
 	for(int i = 0; i < courses.size(); i++){
 		course = courses.get(i);
 		if(course.selected){
-			//System.out.println(course.getName());
+			System.out.println(course.getName());
 			//System.out.println(course.getPreReq());
-			prereqCourses = new LinkedList<Course>();
+			LinkedList<Course> prereqCourses = new LinkedList<Course>();
 			indexesPrereqCourses = courses.get(i).getPreReqCourses();
-			if(!nodeIncomingEdges.containsKey(course)){
-				nodeIncomingEdges.put(course,0);
+			if(!nodeIncomingEdges.containsKey(course.getName())){
+				nodeIncomingEdges.put(course.getName(),0);
 			}
 			//System.out.println("Prereq courses");
 			for(int j = 0; j < indexesPrereqCourses.length; j++){
@@ -180,61 +179,40 @@ public class ProgramLab2 extends CourseList {
 				if(prereqCourse.selected){
 					//System.out.println(prereqCourse.getName());
 					prereqCourses.add(prereqCourse);
-					if(nodeIncomingEdges.containsKey(prereqCourse)){
-						numIncomingEdges = nodeIncomingEdges.get(prereqCourse);
+					if(nodeIncomingEdges.containsKey(prereqCourse.getName())){
+						Integer numIncomingEdges = nodeIncomingEdges.get(prereqCourse.getName());
 						numIncomingEdges+=1;
-						//System.out.println("Already in hash map");
-						//System.out.println(prereqCourse.getName());
-						//System.out.println(numIncomingEdges);
-						nodeIncomingEdges.put(prereqCourse,numIncomingEdges);
+						System.out.println("Already in hash map");
+						System.out.println(prereqCourse.getName());
+						System.out.println(numIncomingEdges);
+						nodeIncomingEdges.put(prereqCourse.getName(),numIncomingEdges);
 						
 					}
+					//else{
+					//	System.out.println("Wasnt in hash map");
+					//	System.out.println(prereqCourse.getName());
+					//	System.out.println(1);
+					//	nodeIncomingEdges.put(prereqCourse.getName(),1);
+					//}
 				}
 			}
+			System.out.println("###########");
 			graph.put(course.getName(),prereqCourses);
 			nodes.add(course);
 		}
 	}
 
 	// See what nodes have no incoming edges
-	ArrayList<Course> keys = new ArrayList<Course>(nodeIncomingEdges.keySet());
+	ArrayList<String> keys = new ArrayList<String>(nodeIncomingEdges.keySet());
 	System.out.println("Nodes with no incoming edges");
 	for(int i = 0 ; i < keys.size() ; i++){
 		if(nodeIncomingEdges.get(keys.get(i)) == 0){
 			nodesNoIncomingEdges.add(keys.get(i));
+			System.out.println(keys.get(i));
 		}
-	}
-	
-	if(nodeIncomingEdges.size()==0){ // if true, then all the courses make a cycle
-		return new ArrayList<Course>(0);
-	}
 
-	// Topological Ordering 
-	LinkedList<Course> adjacencyList;
-	while(!nodesNoIncomingEdges.isEmpty()){
-		course = nodesNoIncomingEdges.poll();
-		sequence.add(course);
-		adjacencyList = graph.get(course.getName());
-		for(int j = 0; j < adjacencyList.size(); j++){
-			prereqCourse = adjacencyList.get(j);
-			numIncomingEdges = nodeIncomingEdges.get(prereqCourse);
-			if(!numIncomingEdges.equals(0)){
-				numIncomingEdges-=1;
-				if(numIncomingEdges.equals(0)){
-					nodesNoIncomingEdges.add(prereqCourse);
-				}
-			}
-			nodeIncomingEdges.put(prereqCourse,numIncomingEdges);
-		}
 	}
-	ArrayList<Course> arr = new ArrayList<Course>();
-	for(int i = sequence.size()-1; i >= 0 ; i--){
-		arr.add(sequence.get(i));
-	}
-	for(int i = 0; i < arr.size() ; i++){
-		System.out.println(arr.get(i).getName());
-	}
-        return arr;
+        return new ArrayList<Course>(0);
     }
     
     public ArrayList<Course> legalSchedule() {
