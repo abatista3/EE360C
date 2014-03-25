@@ -1,6 +1,6 @@
 /*
- * Name: <your name>
- * EID: <your EID>
+ * Name: Alfonso Batista
+ * EID: ab38459
  */
 
 import java.util.ArrayList;
@@ -100,13 +100,14 @@ public class ProgramLab2 extends CourseList {
 						queued.add(adjacentCourse);
 					}
 					else if((spring.contains(unexploredCourse) && spring.contains(adjacentCourse)) || (fall.contains(unexploredCourse) && fall.contains(adjacentCourse))){ // not bipartite
-        					//System.out.println("Not bipartite");
+        					// System.out.println("Not bipartite");
 						return new ArrayList<ArrayList<Course>>(0);
 					}
 				}
 			}
 		}
 	}
+
 	ArrayList<Course> springSemester, fallSemester;
 	springSemester = new ArrayList<Course>(spring);
 	fallSemester = new ArrayList<Course>(fall);
@@ -138,7 +139,7 @@ public class ProgramLab2 extends CourseList {
 				}
 			}	
 	}
-	*/
+	*/	
 		
         return semesters;
     }
