@@ -100,7 +100,6 @@ public class ProgramLab2 extends CourseList {
 						queued.add(adjacentCourse);
 					}
 					else if((spring.contains(unexploredCourse) && spring.contains(adjacentCourse)) || (fall.contains(unexploredCourse) && fall.contains(adjacentCourse))){ // not bipartite
-        					// System.out.println("Not bipartite");
 						return new ArrayList<ArrayList<Course>>(0);
 					}
 				}
@@ -168,27 +167,22 @@ public class ProgramLab2 extends CourseList {
 	for(int i = 0; i < courses.size(); i++){
 		course = courses.get(i);
 		if(course.selected){
-			//System.out.println(course.getName());
-			//System.out.println(course.getPreReq());
 			prereqCourses = new LinkedList<Course>();
 			indexesPrereqCourses = courses.get(i).getPreReqCourses();
 			if(!nodeIncomingEdges.containsKey(course)){
 				nodeIncomingEdges.put(course,0);
 			}
-			//System.out.println("Prereq courses");
 			for(int j = 0; j < indexesPrereqCourses.length; j++){
 				prereqCourse = courses.get(indexesPrereqCourses[j].intValue());
 				if(prereqCourse.selected){
-					//System.out.println(prereqCourse.getName());
 					prereqCourses.add(prereqCourse);
 					if(nodeIncomingEdges.containsKey(prereqCourse)){
 						numIncomingEdges = nodeIncomingEdges.get(prereqCourse);
 						numIncomingEdges+=1;
-						//System.out.println("Already in hash map");
-						//System.out.println(prereqCourse.getName());
-						//System.out.println(numIncomingEdges);
 						nodeIncomingEdges.put(prereqCourse,numIncomingEdges);
-						
+					}
+					else{
+						nodeIncomingEdges.put(prereqCourse,1);
 					}
 				}
 			}
@@ -197,9 +191,9 @@ public class ProgramLab2 extends CourseList {
 		}
 	}
 
+
 	// See what nodes have no incoming edges
 	ArrayList<Course> keys = new ArrayList<Course>(nodeIncomingEdges.keySet());
-	System.out.println("Nodes with no incoming edges");
 	for(int i = 0 ; i < keys.size() ; i++){
 		if(nodeIncomingEdges.get(keys.get(i)) == 0){
 			nodesNoIncomingEdges.add(keys.get(i));
@@ -231,9 +225,6 @@ public class ProgramLab2 extends CourseList {
 	ArrayList<Course> arr = new ArrayList<Course>();
 	for(int i = sequence.size()-1; i >= 0 ; i--){
 		arr.add(sequence.get(i));
-	}
-	for(int i = 0; i < arr.size() ; i++){
-		System.out.println(arr.get(i).getName());
 	}
         return arr;
     }
